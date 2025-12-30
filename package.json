@@ -1,0 +1,26 @@
+{
+  "name": "learning-backend",
+  "version": "1.0.0",
+  "description": "An entry to the Backend",
+  "main": "Src/config/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node Src/config/index.js",
+    "dev": "nodemon Src/config/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DeeCruzz-254/Learning-BackEnd.git"
+  },
+  "author": "Samwel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DeeCruzz-254/Learning-BackEnd/issues"
+  },
+  "homepage": "https://github.com/DeeCruzz-254/Learning-BackEnd#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongoose": "^9.1.0",
+    "nodemon": "^3.1.11"
+  }
+}
