@@ -1,6 +1,18 @@
 // Src/config/app.js — express app instance
 import express from 'express';
 
+//routes can be imported and used here as needed
+import userRoutes from '../routes/user.route.js';
+
 // Create Express app
 const app = express();
+
+// Parse JSON bodies
+app.use(express.json()); //middleware to parse JSON bodies
+
+//routes declaration example
+app.use('/api/v1/users', userRoutes);
+
+//example route: http://localhost:3000/api/v1/users/register
+
 export default app;
