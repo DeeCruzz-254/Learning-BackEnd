@@ -1,11 +1,20 @@
 // Src/config/app.js — express app instance
 import express from 'express';
+import cors from 'cors';
 
 //routes can be imported and used here as needed
 import userRoutes from '../routes/user.route.js';
 
 // Create Express app
 const app = express();
+
+// Enable CORS for frontend communication
+app.use(cors({
+    origin: '*',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Parse JSON bodies
 app.use(express.json()); //middleware to parse JSON bodies
