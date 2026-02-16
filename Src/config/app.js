@@ -5,6 +5,9 @@ import cors from 'cors';
 //routes can be imported and used here as needed
 import userRoutes from '../routes/user.route.js';
 
+// Example of importing another route file
+import postRoutes from '../routes/post.route.js';
+
 // Create Express app
 const app = express();
 
@@ -19,6 +22,8 @@ app.use(cors({
 // Parse JSON bodies
 app.use(express.json()); //middleware to parse JSON bodies
 
+// Use imported routes
+app.use('/api/v1/posts', postRoutes);
 //routes declaration example
 app.use('/api/v1/users', userRoutes);
 
