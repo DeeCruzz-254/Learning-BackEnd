@@ -1,4 +1,5 @@
 import {User} from "../../models/user.model.js";
+import generateToken from "../utils/generateTokens.js";
 
 export const registerUser = async (req, res) => {
     try {
@@ -48,13 +49,39 @@ export const loginUser = async (req, res) => {
             return res.status(400).json({message: 'Invalid email or password'});
         }
         
-        return res.status(200).json({message: 'Login successful', userId: user._id, email: user.email});
+        // Generate JWT token
+        const token = generateToken(user._id);
+        
+        return res.status(200).json({
+            message: 'Login successful',
+            token,
+            userId: user._id,
+            email: user.email
+        });
     } catch (error) {
         console.error('Error logging in:', error.message);
         console.error('Full error:', error);
         return res.status(500).json({message: 'Internal server error', error: error.message});
     }
 };
+
+
+// --- NEW FUNCTION ADDED HERE ---
+export const getProfile = async (req, res) => {
+    try {
+        // req.user comes from your protect middleware
+        const user = await User.findById(req.user.id).select("-password");
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        return res.status(200).json({ success: true, user });
+    } catch (error) {
+        return res.status(500).json({ message: "Error fetching profile" });
+    }
+};
+
+
+
 
 export const updateUser = async (req, res) => {
     try {
