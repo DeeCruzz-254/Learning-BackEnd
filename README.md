@@ -149,12 +149,35 @@ Learning-BackEnd/
   ```json
   {
     "message": "Login successful",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZGMyOTNhZWY4YzMwMDAyNDU2YzEyMyIsImlhdCI6MTcwODY4OTUxMywiZXhwIjoxNzExMjgxNTEzfQ.asdf1234...",
     "userId": "507f1f77bcf86cd799439011",
     "email": "john@example.com"
   }
   ```
 - **Error (400)**: Invalid email or password
 - **Error (400)**: Missing required fields
+
+### Get User Profile (Protected)
+- **URL**: `GET /api/v1/users/profile`
+- **Headers**:
+  ```
+  Authorization: Bearer <your_jwt_token>
+  ```
+- **Success (200)**:
+  ```json
+  {
+    "success": true,
+    "user": {
+      "_id": "507f1f77bcf86cd799439011",
+      "username": "johndoe",
+      "email": "john@example.com",
+      "createdAt": "2026-02-23T12:15:13.425Z",
+      "updatedAt": "2026-02-23T12:15:13.425Z"
+    }
+  }
+  ```
+- **Error (401)**: Not authorized, no token
+- **Error (401)**: Token failed (invalid or expired)
 
 ---
 
@@ -163,8 +186,12 @@ Learning-BackEnd/
 ✅ **Password Hashing**: Passwords are hashed using bcrypt with salt rounds of 10 before storage  
 ✅ **Pre-save Hook**: Automatic password hashing on user creation  
 ✅ **Secure Comparison**: Password comparison using bcrypt.compare()  
-✅ **Input Validation**: Basic validation for required fields  
+✅ **JWT Authentication**: JWT tokens for stateless authentication  
+✅ **Token Expiration**: Tokens expire after 30 days  
+✅ **Protected Routes**: Auth middleware protects sensitive endpoints  
+✅ **Input Validation**: Email, username, and password validation  
 ✅ **Unique Constraints**: Username and email are unique in database  
+✅ **Rate Limiting**: Login attempts limited to 10 per 15 minutes  
 
 ---
 
@@ -183,11 +210,21 @@ Learning-BackEnd/
 - [x] Input validation
 - [x] Error handling
 
-### Phase 3: Current Status ✅
-- [x] All endpoints working
+### Phase 3: JWT Implementation ✅
+- [x] JWT token generation on login
+- [x] Token verification middleware
+- [x] Protected routes with auth middleware
+- [x] Get user profile endpoint
+- [x] Token expiration (30 days)
+- [x] Bearer token validation
+- [x] ES6 module conversion
+
+### Phase 4: Current Status ✅
+- [x] All endpoints working including JWT-protected routes
 - [x] Database integration complete
 - [x] Password security implemented
-- [x] API tested and functional
+- [x] JWT authentication fully functional
+- [x] API tested and verified with Postman/Insomnia
 
 ---
 
@@ -195,10 +232,9 @@ Learning-BackEnd/
 
 ### Short Term
 - [ ] Add email validation (validator library)
-- [ ] Add JWT token authentication for protected routes
-- [ ] Create protected endpoints that require authentication
-- [ ] Implement logout functionality
-- [ ] Add rate limiting to prevent brute force attacks
+- [ ] Implement logout functionality with token blacklist
+- [ ] Add refresh token mechanism
+- [ ] User update endpoint with auth
 
 ### Medium Term
 - [ ] User profile management (update username, email, etc.)
@@ -226,15 +262,17 @@ Learning-BackEnd/
 | Pre-save hook error | ✅ Fixed | Removed `next()` callback in async function |
 | MongoDB connection fails | ✅ Fixed | IP whitelist configured in MongoDB Atlas |
 | `loggedIn` field undefined | ✅ Fixed | Removed unused field from registration |
+| Module system mismatch | ✅ Fixed | Converted all files to ES6 (import/export) |
+| JWT not generated on login | ✅ Fixed | Added `generateToken()` call to loginUser controller |
 
 ---
 
-## 📝 Testing with Postman
+## 📝 Testing with Postman/Insomnia
 
-1. **Register a user**
-   - Method: POST
-   - URL: `http://localhost:3000/api/v1/users/register`
-   - Body (JSON):
+### 1. Register a User
+   - **Method**: POST
+   - **URL**: `http://localhost:3000/api/v1/users/register`
+   - **Body** (JSON):
      ```json
      {
        "username": "testuser",
@@ -243,16 +281,29 @@ Learning-BackEnd/
      }
      ```
 
-2. **Login with the same credentials**
-   - Method: POST
-   - URL: `http://localhost:3000/api/v1/users/login`
-   - Body (JSON):
+### 2. Login to Get JWT Token
+   - **Method**: POST
+   - **URL**: `http://localhost:3000/api/v1/users/login`
+   - **Body** (JSON):
      ```json
      {
        "email": "test@example.com",
        "password": "password123"
      }
      ```
+   - **📌 Copy the `token` from the response**
+
+### 3. Access Protected Route (Get Profile)
+   - **Method**: GET
+   - **URL**: `http://localhost:3000/api/v1/users/profile`
+   - **Headers**:
+     - **Key**: `Authorization`
+     - **Value**: `Bearer <paste_token_here>`
+   - **Expected**: User profile data without password
+
+### 4. Test Token Validation
+   - Try accessing `/api/v1/users/profile` **without** the Authorization header
+   - **Expected**: `401 - Not authorized, no token`
 
 ---
 
@@ -284,12 +335,22 @@ Thanks to all resources and documentation that helped in building this learning 
 
 ---
 
-**Last Updated**: January 27, 2026  
+**Last Updated**: February 23, 2026  
 **Project Status**: Active Development ✅
 
 ---
 
 ## 🎨 Recent Updates
 
-- Updated frontend color scheme to chocolate (#D2691E), deep orange (#FF8C00), and midnight blue (#191970)
-- Enhanced UI with warm, modern color palette
+**v2.0 - JWT Authentication** (Feb 23, 2026)
+- ✅ Implemented JWT token generation on login
+- ✅ Added `protect` middleware for route authentication
+- ✅ Created `/profile` protected endpoint
+- ✅ Added token expiration (30 days)
+- ✅ Converted all files to ES6 modules
+- ✅ Added rate limiting to login endpoint
+
+**v1.0 - Foundation** (Jan 27, 2026)
+- Initial project setup with user registration/login
+- Password hashing with bcrypt
+- MongoDB integration
