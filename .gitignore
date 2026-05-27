@@ -1,0 +1,46 @@
+# Node modules
+node_modules/
+
+# Env files
+.env
+.env.local
+.env.*.local
+.env.*
+!.env.example
+
+# Logs
+npm-debug.log*
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+
+# Build output
+dist/
+build/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Temporary
+tmp/
+temp/
+
+# TypeScript
+*.tsbuildinfo
+
+# Misc
+*.tgz
