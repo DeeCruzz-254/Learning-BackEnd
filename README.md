@@ -111,6 +111,26 @@ Learning-BackEnd/
 
    Server will run on `http://localhost:3000`
 
+### Frontend (static) quick serve
+
+The frontend is a static folder at `frontend/` that can be served independently. Example options:
+
+- With Python:
+```powershell
+cd frontend
+python -m http.server 5500
+```
+Open: `http://localhost:5500`
+
+- With `http-server` (Node):
+```powershell
+cd frontend
+npx http-server -p 5500
+```
+Open: `http://localhost:5500`
+
+Note: The backend runs on `http://localhost:3000` by default; adjust ports if changed in your `.env`.
+
 ---
 
 ## 📡 API Endpoints
@@ -149,9 +169,13 @@ Learning-BackEnd/
   ```json
   {
     "message": "Login successful",
+    "welcome": "Welcome JohnDoe",
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZGMyOTNhZWY4YzMwMDAyNDU2YzEyMyIsImlhdCI6MTcwODY4OTUxMywiZXhwIjoxNzExMjgxNTEzfQ.asdf1234...",
-    "userId": "507f1f77bcf86cd799439011",
-    "email": "john@example.com"
+    "user": {
+      "userId": "507f1f77bcf86cd799439011",
+      "username": "johndoe",
+      "email": "jo*****@example.com"
+    }
   }
   ```
 - **Error (400)**: Invalid email or password
@@ -194,6 +218,25 @@ Learning-BackEnd/
 ✅ **Rate Limiting**: Login attempts limited to 10 per 15 minutes  
 
 ---
+
+## 🛡️ Data Masking (Emails)
+
+- **Purpose**: Protect user privacy by masking email usernames in API responses while keeping the original email stored securely for authentication.
+- **Where implemented**: reusable utility at `Src/utils/maskEmail.js`.
+- **Behavior**:
+  - Only the first two characters of the email username remain visible.
+  - Remaining characters before the `@` are replaced with `*`.
+  - The domain stays unchanged.
+  - Examples:
+    - `johndoe@gmail.com` → `jo*****@gmail.com`
+    - `alex@yahoo.com` → `al**@yahoo.com`
+    - `ab@site.com` → `ab@site.com` (username length ≤ 2, returned unchanged)
+- **Important**: Masking occurs only on responses sent to clients. The database keeps the full email for login, verification, and other backend operations. If you need a masked copy stored in DB (for auditing or display-only use), add a separate `maskedEmail` field explicitly — do not replace the original email used for authentication.
+
+### How to verify masking
+- Backend returns masked emails in `register`, `login`, `profile` and `update` responses. Example login response includes `user.email` masked and a `welcome` message.
+- Use the frontend or a simple curl/PowerShell request to `POST /api/v1/users/login` and inspect the JSON `user.email` field.
+
 
 ## 📊 Progress & Achievements
 
