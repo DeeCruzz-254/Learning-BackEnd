@@ -75,9 +75,9 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
             // Store user data and token
             localStorage.setItem('user', JSON.stringify(data.user));
             localStorage.setItem('token', data.token);
-            
+
             setTimeout(() => {
-                showDashboard(data.user);
+                showDashboard(data); // pass full response so dashboard can show welcome
             }, 1500);
         } else {
             messageDiv.className = 'message error';
@@ -92,16 +92,23 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 });
 
 // Show dashboard after login
-function showDashboard(user) {
+function showDashboard(dataOrUser) {
+    // dataOrUser can be either the full login response (with .user and .welcome)
+    // or a user object stored in localStorage. Normalize to { user, welcome }
+    const payload = dataOrUser && dataOrUser.user ? dataOrUser : { user: dataOrUser };
+
+    const user = payload.user || {};
+    const welcome = payload.welcome || `Welcome back!`;
+
     document.getElementById('registerForm').classList.remove('active');
     document.getElementById('loginForm').classList.remove('active');
     document.getElementById('dashboard').classList.add('active');
-    
+
     const userInfo = document.getElementById('user-info');
     userInfo.innerHTML = `
-        <p><strong>Username:</strong> ${user.username}</p>
-        <p><strong>Email:</strong> ${user.email}</p>
-        <p><strong>Welcome back!</strong></p>
+        <p><strong>Username:</strong> ${user.username || ''}</p>
+        <p><strong>Email:</strong> ${user.email || ''}</p>
+        <p><strong>${welcome}</strong></p>
     `;
 }
 

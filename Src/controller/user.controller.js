@@ -1,5 +1,6 @@
 import {User} from "../../models/user.model.js";
 import generateToken from "../utils/generateTokens.js";
+import maskEmail from "../utils/maskEmail.js";
 
 export const registerUser = async (req, res) => {
     try {
@@ -17,7 +18,14 @@ export const registerUser = async (req, res) => {
         const user = await User.create({
             username, email, password
         });
-        return res.status(201).json({message: 'User registered successfully', userId: user._id,email: user.email});
+        return res.status(201).json({
+            message: 'User registered successfully',
+            user: {
+                userId: user._id,
+                username: user.username,
+                email: maskEmail(user.email)
+            }
+        });
     }
     catch (error) {
         console.error('Error registering user:', error);
@@ -51,12 +59,20 @@ export const loginUser = async (req, res) => {
         
         // Generate JWT token
         const token = generateToken(user._id);
-        
+        // Prepare a display name (capitalize first letter) for welcome message
+        const displayName = user.username
+            ? user.username.charAt(0).toUpperCase() + user.username.slice(1)
+            : 'User';
+
         return res.status(200).json({
             message: 'Login successful',
+            welcome: `Welcome ${displayName}`,
             token,
-            userId: user._id,
-            email: user.email
+            user: {
+                userId: user._id,
+                username: user.username,
+                email: maskEmail(user.email)
+            }
         });
     } catch (error) {
         console.error('Error logging in:', error.message);
@@ -74,7 +90,10 @@ export const getProfile = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        return res.status(200).json({ success: true, user });
+        // Do not expose the raw email in responses; return a masked copy
+        const safeUser = user.toObject ? user.toObject() : {...user};
+        if (safeUser.email) safeUser.email = maskEmail(safeUser.email);
+        return res.status(200).json({ success: true, user: safeUser });
     } catch (error) {
         return res.status(500).json({ message: "Error fetching profile" });
     }
@@ -102,7 +121,11 @@ export const updateUser = async (req, res) => {
         if (password) user.password = password;
         
         const updatedUser = await user.save();
-        return res.status(200).json({message: 'User updated successfully', userId: updatedUser._id, email: updatedUser.email});
+        return res.status(200).json({message: 'User updated successfully', user: {
+            userId: updatedUser._id,
+            username: updatedUser.username,
+            email: maskEmail(updatedUser.email)
+        }});
     } catch (error) {
         console.error('Error updating user:', error);
         return res.status(500).json({message: 'Internal server error'});
